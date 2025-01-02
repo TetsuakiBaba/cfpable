@@ -1,3 +1,5 @@
+![CFPable Logo](logo.png)
+
 # cfpable
 
 A simple CFP (Call For Papers) editor and sharing it with others.

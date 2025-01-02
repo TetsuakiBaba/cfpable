@@ -76,7 +76,7 @@ $version = $manifestData['version'] ?? 'unknown';
     <div class="text-center">
       Version: <?php echo htmlspecialchars($version, ENT_QUOTES); ?>
     </div>
-  </footer>
+  </footer>A
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
