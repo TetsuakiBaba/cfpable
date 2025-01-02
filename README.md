@@ -4,6 +4,9 @@
 
 A simple CFP (Call For Papers) editor and sharing it with others.
 
+## try it out
+You can try it out at [https://tetsuakibaba.jp/project/cfpable/](https://tetsuakibaba.jp/project/cfpable/)
+
 ## Installation
 
 1. Clone the repository
