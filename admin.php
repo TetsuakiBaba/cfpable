@@ -4,7 +4,7 @@ session_start(); // セッションを利用
 require_once __DIR__ . '/db.php';
 
 // 簡易パスワード（サンプル用）
-define('ADMIN_PASS', 'pass');
+define('ADMIN_PASS', 'EwXluyrtTxx+');
 
 // すでにログイン済みの場合
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {

@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/db.php';
-
 // 1. manifest.json を読み込み、配列に変換
 $manifestPath = __DIR__ . '/manifest.json';
 $manifestData = [];
@@ -55,10 +54,16 @@ $version = $manifestData['version'] ?? 'unknown';
             $stmt->bindValue(':body', $cfpName, PDO::PARAM_STR);
             $stmt->execute();
 
-            header("Location: edit.php?key={$uniqueTableName}");
+            
+            echo "<div class='alert alert-success'>テーブルを作成しました。{$uniqueTableName}へ リダイレクトします...</div>";
+            // PHPで処理を行う
+            $uniqueTableName = "{$uniqueTableName}";
+            echo '<script>';
+            echo 'window.location.href = "edit.php?key=' . htmlspecialchars($uniqueTableName, ENT_QUOTES) . '";';
+            echo '</script>';
             exit;
         }
-    }
+      }
     ?>
 
     <form method="post" class="row g-3">
