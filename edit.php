@@ -17,8 +17,12 @@ $encryptedToken = encryptTableId($tableKey);
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $host = $_SERVER['HTTP_HOST']; // ドメイン名（例: yourdomain.com）
 
+// ベースURLを取得 (dirnameでスクリプトのディレクトリ部分を切り出す)
+$baseUrl = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+
+
 // 完全な公開用URLを生成
-$publishUrl = $protocol . $host . "/publish.php?token=" . urlencode($encryptedToken);
+$publishUrl = $protocol . $host . $baseUrl. "/publish.php?token=" . urlencode($encryptedToken);
 
 
 /**
