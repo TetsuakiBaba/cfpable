@@ -12,10 +12,19 @@ You can try it out at [https://tetsuakibaba.jp/project/cfpable/](https://tetsuak
 1. Clone the repository
 ```bash
 git clone https://github.com/TetsuakiBaba/cfpable.git
+cd cfpable
 ```
-2. edit admin.php and change the password. Or you can move admin.php to a secure location.
-3. Please upload the `cfpable` folder to your server and access it via your browser.
-The system needs php and a web server to run.
+
+2. Create a file named `keys.php` by following the command below. Change the password as needed.
+```bash
+echo "<?php
+define('ENCRYPTION_KEY', 'your_secure_encryption_key_here'); // 32byte
+define('ENCRYPTION_IV', 'your_secure_iv_1');   // 16byte(fixed)
+define('ADMIN_PASS', 'your_pass'); // Admin password
+?>" > keys.php
+```
+
+3. Please upload the `cfpable` folder to your server and access it via your browser. The system needs php and a web server to run.
 
 ## Usage
 1. Access the top page by going to `index.php`.
@@ -26,5 +35,6 @@ The system needs php and a web server to run.
 
 ## Dependencies
 * php: 7.4 and above
+* sqlite
 * web server: apache, nginx, etc.
 

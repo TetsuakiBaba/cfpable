@@ -2,9 +2,9 @@
 session_start(); // セッションを利用
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/keys.php';
 
-// 簡易パスワード（サンプル用）
-define('ADMIN_PASS', 'EwXluyrtTxx+');
+
 
 // すでにログイン済みの場合
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
@@ -26,7 +26,9 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <html lang="ja">
     <head>
       <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
       <title>CFPable - Admin</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     </head>
     <body>

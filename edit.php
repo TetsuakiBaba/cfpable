@@ -1,11 +1,25 @@
 <?php
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/crypto.php';
+require_once __DIR__ . '/utils.php';
 
 // 1) keyパラメータ取得 & テーブル存在チェック
 $tableKey = $_GET['key'] ?? '';
 if ($tableKey === '' || !tableExists($db, $tableKey)) {
     die("不正なアクセスです。テーブルが見つかりません。");
 }
+
+// 暗号化トークンを生成
+$encryptedToken = encryptTableId($tableKey);
+
+// 公開用URLを生成
+// サーバーのプロトコルとホストを取得
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+$host = $_SERVER['HTTP_HOST']; // ドメイン名（例: yourdomain.com）
+
+// 完全な公開用URLを生成
+$publishUrl = $protocol . $host . "/publish.php?token=" . urlencode($encryptedToken);
+
 
 /**
  * ----------------------------------------------------------------
@@ -179,8 +193,10 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CFPable - Edit</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
     /* ドラッグ中の行を半透明にする */
     tr.dragging {
@@ -215,23 +231,23 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <table class="table table-bordered align-middle" id="sortable-table">
       <thead class="table-light">
         <tr>
-          <th style="width:4rem;">Delete</th>
-          <th style="width:4rem;">Drag</th>
-          <th style="width:12rem;">Section Type</th>
-          <th style="width:20rem;">Section Title</th>
-          <th>Section Body</th>
+          <th style="width:5%;">Delete</th>
+          <th style="width:5%;">Drag</th>
+          <th style="width:20%;">Section Type</th>
+          <th style="width:20%;">Section Title</th>
+          <th style="width:50%;">Section Body</th>
         </tr>
       </thead>
       <tbody>
         <?php foreach ($records as $r): ?>
-        <tr draggable="true" data-id="<?php echo $r['id']; ?>">
+        <tr draggable="true"  data-id="<?php echo $r['id']; ?>">
           <!-- Delete -->
           <td class="text-center">
             <input class="form-check-input" type="checkbox"
                    name="existing[<?php echo $r['id']; ?>][delete]" value="1">
           </td>
           <!-- Drag handle -->
-          <td style="cursor: move;">&#9776;</td>
+          <td class="text-center"style="cursor: move;">&#9776;</td>
 
           <!-- Section Type -->
           <td>
@@ -277,70 +293,96 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </table>
 
     <div class="mb-3">
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-success"><i class="bi bi-floppy2"></i> Apply</button>
       <!-- Previewボタン（モーダル表示） -->
-      <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#previewModal">
-        Preview
-      </button>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#previewModal">
+      <i class="bi bi-eye"></i> Preview
+      </button>      
     </div>
   </form>
 
   <hr>
   <div class="row">
-    <!-- (B) テーブル削除 -->
-  <form method="post" class="mb-3">
-    <input type="hidden" name="delete_table" value="1">
-    <button type="submit" class="btn btn-danger"
-            onclick="return confirm('本当にこのテーブルを削除しますか？')">
-      Delete This Table
-    </button>
-  </form>
+  <div class="input-group mb-2">
+    <!-- 新しいCFP作成 (index.phpへ) -->
+    <form action="index.php" class="me-2  mb-2">
+      <button type="submit" class="btn btn-secondary">
+      <i class="bi bi-cloud-plus"></i> Create new CFP
+      </button>
+    </form>
+    
+  
 
-  <!-- 新しいCFP作成 (index.phpへ) -->
-  <form action="index.php" class="mb-3">
-    <button type="submit" class="btn btn-success">
-      Create new CFP
-    </button>
-  </form>
+    <!-- (C) このCFPを複製 -->
+    <form method="post" class="me-2 mb-2">
+      <input type="hidden" name="clone_cfp" value="1">
+      <button type="submit" class="btn btn-secondary"
+              onclick="return confirm('このCFPを複製しますか？')">
+              <i class="bi bi-copy"></i> Duplicate This CFP
+      </button>
+    </form>
 
-  <!-- (C) このCFPを複製 -->
-  <form method="post" class="mb-3">
-    <input type="hidden" name="clone_cfp" value="1">
-    <button type="submit" class="btn btn-warning"
-            onclick="return confirm('このCFPを複製しますか？')">
-      Duplicate This CFP
-    </button>
-  </form>
+    <!-- 現在のリンクをコピー -->
+    <div class="me-2  mb-2">
+      <button type="button" class="btn btn-secondary" id="copyUrlBtn">
+      <i class="bi bi-share"></i> Copy This Page Link
+      </button>
+    </div>
+       
 
-  <!-- 現在のリンクをコピー -->
-  <div class="mb-3">
-    <button type="button" class="btn btn-info" id="copyUrlBtn">Copy This Page Link</button>
-  </div>
+         <!-- (B) テーブル削除 -->
+    <form method="post" class="me-2 mb-2">
+      <input type="hidden" name="delete_table" value="1">
+      <button type="submit" class="btn btn-danger"
+              onclick="return confirm('本当にこのテーブルを削除しますか？')">
+              <i class="bi bi-trash"></i> Delete This Table
+      </button>
+    </form>
+    </div>
         </div>
 </div>
 
 <!-- Preview用モーダル -->
 <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-fullscreen">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">CFP Preview</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
       </div>
       <div class="modal-body" id="previewContent">
-        <?php
+        <pre style="white-space:pre-wrap"><?php
         // プレビュー用テキストを一括生成
-        $previewData = '';
-        foreach ($records as $r) {
-            $previewData .= "==== [{$r['section_type']}] {$r['section_title']} ====\n";
-            $previewData .= ($r['section_body'] ?? '') . "\n\n";
-        }
-        echo nl2br(htmlspecialchars($previewData, ENT_QUOTES));
+        $previewData = generateCFPString($records);        
+        echo htmlspecialchars($previewData, ENT_QUOTES);
+        // echo $previewData;
         ?>
+        </pre>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" id="copyTxtBtn">Copy as Text</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+        <button type="button" class="btn btn-success" id="copyTxtBtn">
+        <i class="bi bi-clipboard"></i> <span id="button_copy_as_text">Copy as Text</span>
+        </button>
+        <button type="button" class="btn btn-success">
+        <i class="bi bi-link"></i> <span id="button_copy_link">Copy Link</span>
+        <script>
+          document.getElementById('button_copy_link').addEventListener('click', () => {
+            const currentUrl = window.location.href;
+            <?php echo "const url = '{$publishUrl}';"?>
+            navigator.clipboard.writeText(url)
+              .then(() => {
+                document.getElementById('button_copy_link').textContent = 'Copied!';
+                setTimeout(() => {
+                  document.getElementById('button_copy_link').textContent = 'Copy Link';
+                }, 1000);
+              })
+              .catch(err => {
+                
+              });
+          });
+          </script>
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -356,13 +398,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewContent = document.getElementById('previewContent');
   if (copyTxtBtn && previewContent) {
     copyTxtBtn.addEventListener('click', () => {
-      const textToCopy = previewContent.innerText;
+      const textToCopy = previewContent.innerText+"\n\nCreated by cfpable: https://github.com/TetsuakiBaba/cfpable\n";
+
+
+      navigator.clipboard.writeText(textToCopy)
+      const copy_button = document.getElementById('button_copy_as_text');
       navigator.clipboard.writeText(textToCopy)
         .then(() => {
-          alert('テキストをコピーしました！');
+          // copy as textのボタンを1秒間 Copied に変更
+          copy_button.textContent = 'Copied!';
+          setTimeout(() => {
+            copy_button.textContent = 'Copy as Text';
+          }, 1000);
+
         })
         .catch(err => {
-          console.error('コピー失敗:', err);
+          // copy as textのボタンを1秒間 Copied に変更
+          copy_button.textContent = 'Copy failed';
+          setTimeout(() => {
+            copy_button.textContent = 'Copy as Text';
+          }, 1000);
+          
         });
     });
   }
