@@ -192,6 +192,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
 // ----------------------------------------------------------
 $stmt = $db->query("SELECT * FROM {$tableKey} ORDER BY sort_order ASC, id ASC");
 $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+function autoLink($text) {
+  // まずはテキスト全体をエスケープ
+  $escapedText = htmlspecialchars($text, ENT_QUOTES);
+
+  // 正規表現で「https://」で始まるURLを検出
+  $pattern = '/(https:\/\/[^\s]+)/';
+
+  // マッチしたURL部分をアンカータグに置換
+  $linkedText = preg_replace_callback($pattern, function ($matches) {
+      $url = $matches[0];
+      return '<a href="' . $url . '" target="_blank" rel="noopener noreferrer">' . $url . '</a>';
+  }, $escapedText);
+
+  return $linkedText;
+}
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -358,7 +377,8 @@ $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <pre style="white-space:pre-wrap"><?php
         // プレビュー用テキストを一括生成
         $previewData = generateCFPString($records);        
-        echo htmlspecialchars($previewData, ENT_QUOTES);
+        // echo htmlspecialchars($previewData, ENT_QUOTES);
+        echo autoLink($previewData);
         // echo $previewData;
         ?>
         </pre>

@@ -46,7 +46,7 @@ $cfp_string = generateCFPString($records);
         <div class="row mb-4">
             <div class="card">                
                 <div class="card-body">
-                    <pre style="white-space: pre-wrap;"><?php echo $cfp_string; ?></pre>
+                    <pre style="white-space: pre-wrap;"><?php echo autoLink($cfp_string); ?></pre>
                 </div>
             </div>
         <div>

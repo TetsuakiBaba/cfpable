@@ -48,4 +48,20 @@ function generateDecoratedString($text, $decorationChar = '*', $margin = 2) {
     return $previewData;    
   }
   
+
+  function autoLink($text) {
+    // まずはテキスト全体をエスケープ
+    $escapedText = htmlspecialchars($text, ENT_QUOTES);
+  
+    // 正規表現で「https://」で始まるURLを検出
+    $pattern = '/(https:\/\/[^\s]+)/';
+  
+    // マッチしたURL部分をアンカータグに置換
+    $linkedText = preg_replace_callback($pattern, function ($matches) {
+        $url = $matches[0];
+        return '<a href="' . $url . '" target="_blank" rel="noopener noreferrer">' . $url . '</a>';
+    }, $escapedText);
+  
+    return $linkedText;
+  }
 ?>
