@@ -40,14 +40,14 @@ define('ADMIN_PASS', 'your_pass'); // Admin password
 
 ## API
 
-CFPable は、CFP コンテンツを外部ページから取得できる API を提供します。API を利用する際は、必ず `token` 引数を指定してください。
+CFPable provides an API that allows you to retrieve CFP content from external pages. When using the API, you must specify the `token` parameter.
 
-- HTML 形式: `publish.php?disp=html&raw=true&token=YOUR_TOKEN`
-- テキスト形式: `publish.php?disp=text&raw=true&token=YOUR_TOKEN`
+- HTML format: `publish.php?disp=html&raw=true&token=YOUR_TOKEN`
+- Text format: `publish.php?disp=text&raw=true&token=YOUR_TOKEN`
 
-CORS ヘッダーを返すため、ブラウザの `fetch()` で直接読み込むことができます。
+CORS headers are returned, so you can load the content directly using the browser's `fetch()`.
 
-### fetch() の使用例
+### Example usage with fetch()
 
 ```html
 <script>
