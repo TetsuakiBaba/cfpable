@@ -38,3 +38,25 @@ define('ADMIN_PASS', 'your_pass'); // Admin password
 * sqlite
 * web server: apache, nginx, etc.
 
+## API
+
+CFPable は、CFP コンテンツを外部ページから取得できる API を提供します。API を利用する際は、必ず `token` 引数を指定してください。
+
+- HTML 形式: `publish.php?disp=html&raw=true&token=YOUR_TOKEN`
+- テキスト形式: `publish.php?disp=text&raw=true&token=YOUR_TOKEN`
+
+CORS ヘッダーを返すため、ブラウザの `fetch()` で直接読み込むことができます。
+
+### fetch() の使用例
+
+```html
+<script>
+fetch('https://yourdomain/path/to/cfpable/publish.php?disp=text&raw=true&token=YOUR_TOKEN')
+    .then(res => res.text())
+    .then(cfpText => {
+        document.getElementById('cfp').textContent = cfpText;
+    });
+</script>
+<div id="cfp"></div>
+```
+

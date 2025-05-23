@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CFPable Fetch API Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+        }
+
+        .result {
+            border: 1px solid #ccc;
+            padding: 1em;
+            margin-top: 1em;
+            background: #fafafa;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>CFPable publish.php fetchテスト</h1>
+    <label>
+        publish.phpのURL（token, dispパラメータ付き可）:<br>
+        <input type="text" id="urlInput" style="width: 80%;"
+            value="https://tetsuakibaba.jp/project/cfpable/publish.php?token=YOUR_TOKEN_HERE">
+    </label>
+    <br>
+    <button id="fetchTextBtn">fetch as text</button>
+    <button id="fetchHtmlBtn">fetch as HTML</button>
+    <div class="result">
+        <h3>取得結果</h3>
+        <textarea id="resultArea" readonly></textarea>
+    </div>
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const resultArea = document.getElementById('resultArea');
+        document.getElementById('fetchTextBtn').onclick = function () {
+            const url = new URL(urlInput.value);
+            url.searchParams.set('disp', 'text');
+            fetch(url, { headers: { 'Accept': 'text/plain' } })
+                .then(r => r.text())
+                .then(txt => resultArea.value = txt)
+                .catch(e => resultArea.value = 'Error: ' + e);
+        };
+        document.getElementById('fetchHtmlBtn').onclick = function () {
+            const url = new URL(urlInput.value);
+            url.searchParams.set('disp', 'html');
+            fetch(url, { headers: { 'Accept': 'text/html' } })
+                .then(r => r.text())
+                .then(txt => resultArea.value = txt)
+                .catch(e => resultArea.value = 'Error: ' + e);
+        };
+    </script>
+</body>
+
+</html>
