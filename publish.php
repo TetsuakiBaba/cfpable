@@ -2,6 +2,10 @@
 require_once __DIR__  . '/crypto.php'; // 暗号化関数を読み込み
 require_once __DIR__ . '/db.php';     // データベース接続
 require_once __DIR__ . '/utils.php';
+// manifest.json からバージョンを読み込み
+$manifestPath = __DIR__ . '/manifest.json';
+$manifestData = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : [];
+$version = $manifestData['version'] ?? 'unknown';
 
 // トークンを取得
 $token = $_GET['token'] ?? '';
@@ -92,7 +96,7 @@ if ($isApiRequest) {
             </div>
             <div class="row mt-4">
                 <footer class="text-center small text-muted">
-                    <p>&copy; 2025 <a href="https://github.com/TetsuakiBaba/cfpable" targe="_blank">CFPable</a> by <a href="https://github.com/TetsuakiBaba" target="_blank">Tetsuaki Baba</a></p>
+                    <p>&copy; <?php echo date('Y'); ?> <a href="https://github.com/TetsuakiBaba/cfpable" target="_blank">CFPable</a> by <a href="https://github.com/TetsuakiBaba" target="_blank">Tetsuaki Baba</a> | Version: <?php echo htmlspecialchars($version, ENT_QUOTES); ?></p>
                 </footer>
             </div>
 

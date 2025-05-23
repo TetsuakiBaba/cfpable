@@ -2,6 +2,10 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/crypto.php';
 require_once __DIR__ . '/utils.php';
+// manifest.json からバージョンを読み込み
+$manifestPath = __DIR__ . '/manifest.json';
+$manifestData = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : [];
+$version = $manifestData['version'] ?? 'unknown';
 
 // 1) keyパラメータ取得 & テーブル存在チェック
 $tableKey = $_GET['key'] ?? '';
